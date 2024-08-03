@@ -1,0 +1,10 @@
+.idea
+.idea/
+.idea/*
+*.pyc
+*.pyo
+*.pyd
+.venv
+db.sqlite3
+.env
+__pycache__
