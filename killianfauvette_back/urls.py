@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import Home
+from .views import Home, Root
 
 urlpatterns = [
+    path('', Root.as_view(), name='home'),
     path('admin/', admin.site.urls),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/jwt-test/', Home.as_view(), name='jwt-test'),
+    path('token/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('jwt-test/', Home.as_view(), name='jwt-test'),
+    path('images/', include('images.urls'))
 ]
