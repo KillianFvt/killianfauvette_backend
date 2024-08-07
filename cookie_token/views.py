@@ -39,7 +39,9 @@ class CookieTokenRefreshView(TokenRefreshView):
                 'refresh_token',
                 response.data['refresh'],
                 max_age=cookie_max_age,
-                httponly=True
+                httponly=True,
+                secure=True,
+                samesite='None'
             )
             del response.data['refresh']
 
@@ -49,7 +51,9 @@ class CookieTokenRefreshView(TokenRefreshView):
                 'access_token',
                 response.data['access'],
                 max_age=access_token_expiry,
-                httponly=True
+                httponly=True,
+                secure=True,
+                samesite='None'
             )
             del response.data['access']
 
