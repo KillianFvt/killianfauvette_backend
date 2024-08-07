@@ -6,8 +6,9 @@ from .views import Home, Root
 urlpatterns = [
     path('', Root.as_view(), name='home'),
     path('admin/', admin.site.urls),
-    path('token/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/', include('cookie_token.urls')),
+    path('tokenold/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('tokenold/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('jwt-test/', Home.as_view(), name='jwt-test'),
     path('images/', include('images.urls'))
 ]

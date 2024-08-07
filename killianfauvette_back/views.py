@@ -1,7 +1,8 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from cookie_token.auth_class import CookieJWTAuthentication
 
 
 class Root(APIView):
@@ -28,13 +29,15 @@ class Root(APIView):
 
 
 class Home(APIView):
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request) -> Response:
         content = {
             'user': str(request.user),
-            'token': str(request.auth)
+            'request': request.data,
+            'token': request.COOKIES.get('access_token'),
+            'refresh': request.COOKIES.get('refresh_token'),
         }
         return Response(content)
 
