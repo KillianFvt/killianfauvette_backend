@@ -1,7 +1,6 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from cookie_token.auth_class import CookieJWTAuthentication
 
 
@@ -14,11 +13,6 @@ class Root(APIView):
         user = request.user
         content = {
             'message': 'Killian Fauvette API',
-            'user': {
-                'is_authenticated': user.is_authenticated,
-                'username': user.username,
-                'email': user.email if user.is_authenticated else None,
-            },
             'endpoints': [
                 '/api/token/',
                 '/api/token/refresh/',
@@ -28,7 +22,7 @@ class Root(APIView):
         return Response(content)
 
 
-class Home(APIView):
+class Test(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -47,3 +41,6 @@ class Home(APIView):
             'data': request.data
         }
         return Response(content)
+
+
+
