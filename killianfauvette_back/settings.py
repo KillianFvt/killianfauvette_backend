@@ -29,6 +29,7 @@ DEBUG = env['DEBUG']
 
 ALLOWED_HOSTS = env['ALLOWED_HOSTS'].split(',')
 CORS_ORIGIN_WHITELIST = env['CORS_ORIGIN_WHITELIST'].split(',')
+CORS_ALLOW_CREDENTIALS = True
 
 
 # Application definition
