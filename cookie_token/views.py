@@ -1,4 +1,7 @@
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenRefreshView, TokenObtainPairView
+
 from cookie_token.serializers import CookieTokenRefreshSerializer
 
 
@@ -60,3 +63,14 @@ class CookieTokenRefreshView(TokenRefreshView):
         return super().finalize_response(request, response, *args, **kwargs)
 
     serializer_class = CookieTokenRefreshSerializer
+
+
+class CookieTokenLogoutView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request):
+        response = Response(status=204)
+        response.delete_cookie('refresh_token')
+        response.delete_cookie('access_token')
+        return response
