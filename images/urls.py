@@ -2,9 +2,13 @@ from django.urls import path
 from .views import ImageViewSet
 
 urlpatterns = [
-    path('all/', ImageViewSet.as_view({'get': 'list'}), name='images-all'),
-    path('create/', ImageViewSet.as_view({'post': 'create'}), name='images-create'),
-    path('update/<int:pk>/', ImageViewSet.as_view({'put': 'update'}), name='images-update'),
-    path('delete/<int:pk>/', ImageViewSet.as_view({'delete': 'destroy'}), name='images-delete'),
-    path('<int:pk>/', ImageViewSet.as_view({'get': 'retrieve'}), name='images-retrieve'),
+    path('', ImageViewSet.as_view({'get': 'list', 'post': 'create'}), name='images'),
+    path('<int:pk>/', ImageViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'delete': 'destroy',
+        'patch': 'partial_update'
+    }), name='image'),
+    path('<int:pk>/add_users/', ImageViewSet.as_view({'patch': 'add_users'}), name='image-add-user'),
+    path('<int:pk>/remove_users/', ImageViewSet.as_view({'patch': 'remove_users'}), name='image-remove-user'),
 ]

@@ -32,6 +32,10 @@ class Image(models.Model):
     def get_users(self):
         return self.belongs_to.all()
 
+    def add_users(self, users):
+        for user in users:
+            UserImage.objects.create(user=user, image=self)
+
     def __str__(self):
         return self.url
 
