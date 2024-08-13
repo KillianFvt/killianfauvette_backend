@@ -42,6 +42,7 @@ class UserViewSet(viewsets.ModelViewSet):
         )
 
         users = users.distinct()
+        users = users[:10]
         return Response([{
             'id': user.id,
             'username': user.username,
