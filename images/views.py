@@ -16,6 +16,13 @@ class ImageViewSet(viewsets.ModelViewSet):
     queryset = Image.objects.all()
     serializer_class = ImageSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Retrieve an image
+        """
+        # TODO add logic to check if the user has access to the image
+        return super().retrieve(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         """
         Creates an image
