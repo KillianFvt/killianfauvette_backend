@@ -26,12 +26,15 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return Response(content)
 
-    @action(detail=False, methods=['get'])
+    @action(methods=['get'], detail=False)
     def search_users(self, request) -> Response:
+        if not request.user.is_superuser:
+            return Response({'error': 'Unauthorized'}, status=403)
+
         query = request.query_params.get('query')
 
         if not query:
-            return Response({'error': 'query parameter is required'}, status=400)
+            return Response({[]})
 
         users = (
             User.objects.filter(username__icontains=query) |
