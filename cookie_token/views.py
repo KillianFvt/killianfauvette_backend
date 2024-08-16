@@ -19,7 +19,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
             del response.data['refresh']
 
         if response.data.get('access'):
-            access_token_expiry = 3600  # 1 hour
+            access_token_expiry = 3600 # 1 hour
             response.set_cookie(
                 'access_token',
                 response.data['access'],

@@ -1,12 +1,12 @@
+from django.contrib.auth.models import User
+from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from cookie_token.auth_class import CookieJWTAuthentication
 from .models import Image
 from .serializers import ImageSerializer
-from rest_framework.decorators import action
-from rest_framework import status
-from django.contrib.auth.models import User
 
 
 class ImageViewSet(viewsets.ModelViewSet):
@@ -30,16 +30,12 @@ class ImageViewSet(viewsets.ModelViewSet):
         if belongs_to is not provided, it defaults to the admin user
         if has_watermark is not provided, it defaults to False
         """
-        name = request.data.get('name')
-        url = request.data.get('url')
-        has_watermark = request.data.get('has_watermark')
+
+
         belongs_to = request.data.get('belongs_to')
-        if not name or not url:
-            return Response({'error': 'name and url are required'}, status=status.HTTP_400_BAD_REQUEST)
+
         if not belongs_to:
             belongs_to = []
-        if not has_watermark:
-            has_watermark = False
 
         users = []
 
@@ -50,11 +46,38 @@ class ImageViewSet(viewsets.ModelViewSet):
             except User.DoesNotExist:
                 return Response({'error': f'User {user_id} not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        image = Image.objects.create(name=name, url=url, has_watermark=has_watermark)
-        image.add_users(users)
-        image.save()
+        images = request.data.get('images')
+        if not images:
+            return Response({'error': 'images is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'details': 'image created'}, status=status.HTTP_201_CREATED)
+        created_images = []
+
+        for image in images:
+
+            name = image.get('name')
+            url = image.get('url')
+            has_watermark = image.get('has_watermark')
+
+            if not name or not url:
+                return Response({'error': 'name and url are required for every image'}, status=status.HTTP_400_BAD_REQUEST)
+            if not has_watermark:
+                has_watermark = False
+
+            try:
+                new_image = Image.objects.create(name=name, url=url, has_watermark=has_watermark)
+                new_image.add_users(users)
+                new_image.save()
+                created_images.append(new_image)
+            except Exception as e:
+                for created_image in created_images:
+                    created_image.delete()
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'details': 'image created',
+            'image_ids': [image.id for image in created_images],
+        }, status=status.HTTP_201_CREATED)
+
 
     def list(self, request, *args, **kwargs):
         """

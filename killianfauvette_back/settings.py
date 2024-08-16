@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'corsheaders',
     "images.apps.ImagesConfig",
     "cookie_token.apps.CookieTokenConfig",
-    "accounts.apps.AccountsConfig"
+    "accounts.apps.AccountsConfig",
+    "albums.apps.AlbumsConfig"
 ]
 
 MIDDLEWARE = [

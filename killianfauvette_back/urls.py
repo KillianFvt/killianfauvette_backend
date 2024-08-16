@@ -12,4 +12,5 @@ urlpatterns = [
     path('jwt-test/', Test.as_view(), name='jwt-test'),
     path('images/', include('images.urls')),
     path('users/', include('accounts.urls')),
+    path('albums/', include('albums.urls')),
 ]
