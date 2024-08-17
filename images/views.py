@@ -4,6 +4,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
 from cookie_token.auth_class import CookieJWTAuthentication
 from .models import Image
 from .serializers import ImageSerializer
@@ -20,7 +21,15 @@ class ImageViewSet(viewsets.ModelViewSet):
         """
         Retrieve an image
         """
-        # TODO add logic to check if the user has access to the image
+
+        if not request.user.is_staff:
+            image = self.get_object()
+            if request.user not in image.belongs_to.all():
+                return Response(
+                    {'error': 'You do not have permission to view this image'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
         return super().retrieve(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
@@ -30,7 +39,6 @@ class ImageViewSet(viewsets.ModelViewSet):
         if belongs_to is not provided, it defaults to the admin user
         if has_watermark is not provided, it defaults to False
         """
-
 
         belongs_to = request.data.get('belongs_to')
 
@@ -59,7 +67,8 @@ class ImageViewSet(viewsets.ModelViewSet):
             has_watermark = image.get('has_watermark')
 
             if not name or not url:
-                return Response({'error': 'name and url are required for every image'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'name and url are required for every image'},
+                                status=status.HTTP_400_BAD_REQUEST)
             if not has_watermark:
                 has_watermark = False
 
@@ -83,6 +92,9 @@ class ImageViewSet(viewsets.ModelViewSet):
         """
         List all images for a user
         if the user is not staff, only images that belong to the user are returned
+
+        :param request: request object
+        :rtype: Response
         """
         if not request.user.is_staff:
             queryset = Image.objects.filter(belongs_to=request.user)
@@ -96,6 +108,10 @@ class ImageViewSet(viewsets.ModelViewSet):
         """
         Add users to an image
         get the user_ids from the request data
+
+        :param pk: image id
+        :param request: request object
+        :rtype: Response
         """
 
         image = self.get_object()
@@ -132,3 +148,24 @@ class ImageViewSet(viewsets.ModelViewSet):
 
         image.save()
         return Response({'details': f'users {user_ids} removed'}, status=status.HTTP_200_OK)
+
+
+    @action(detail=False, methods=['delete'])
+    def delete_images(self, request):
+        """
+        Delete images
+        get the image_ids from the request data
+        """
+
+        image_ids = request.data.get('image_ids')
+        if not image_ids:
+            image_ids = []
+
+        for image_id in image_ids:
+            try:
+                image = Image.objects.get(id=image_id)
+                image.delete()
+            except Image.DoesNotExist:
+                return Response({'error': f'Image {image_id} not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({'details': f'images {image_ids} deleted'}, status=status.HTTP_200_OK)

@@ -1,10 +1,13 @@
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, IntegrityError
 
 
 class UserImage(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     image = models.ForeignKey('Image', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ['user', 'image']
 
 
 class Image(models.Model):
@@ -19,22 +22,22 @@ class Image(models.Model):
         verbose_name = 'Image'
         verbose_name_plural = 'Images'
 
-    def upload(self):
-        # TODO add CDN upload logic here
-        print(f"Uploading image {self.url} to CDN")
-        super().save()
-
-    def delete(self, *args, **kwargs):
-        # TODO add CDN delete logic here
-        print(f"Deleting image {self.url} from CDN")
-        super().delete(*args, **kwargs)
-
-    def get_users(self):
+    def get_users(self) -> list[User]:
         return self.belongs_to.all()
 
-    def add_users(self, users):
+    def add_users(self, users) -> None:
         for user in users:
-            UserImage.objects.create(user=user, image=self)
+            try:
+                UserImage.objects.create(user=user, image=self)
+            except IntegrityError:
+                continue
+
+    def remove_users(self, users):
+        for user in users:
+            try:
+                UserImage.objects.get(user=user, image=self).delete()
+            except UserImage.DoesNotExist:
+                continue
 
     def __str__(self):
         return self.url

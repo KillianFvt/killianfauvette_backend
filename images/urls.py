@@ -11,4 +11,5 @@ urlpatterns = [
     }), name='image'),
     path('<int:pk>/add_users/', ImageViewSet.as_view({'patch': 'add_users'}), name='image-add-user'),
     path('<int:pk>/remove_users/', ImageViewSet.as_view({'patch': 'remove_users'}), name='image-remove-user'),
+    path('delete_images/', ImageViewSet.as_view({'delete': 'delete_images'}), name='delete-images'),
 ]
